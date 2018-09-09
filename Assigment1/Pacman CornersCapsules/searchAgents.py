@@ -567,9 +567,25 @@ def mazeDistance(point1, point2, gameState):
 
 class CornersAndCapsulesProblem(search.SearchProblem):
     def __init__(self, startingGameState):
-        self.start = (startingGameState.getPacmanPosition(), startingGameState.getFood())
         self.walls = startingGameState.getWalls()
         self.capsules = startingGameState.getCapsules()
+
+        #Considera las capsulas como comida
+        foodGrid = startingGameState.getFood().copy()
+
+        #h, w = foodGrid.width, foodGrid.height;
+        #capsulesGrid = [[False for x in range(w)] for y in range(h)] 
+
+        capsulesGrid = startingGameState.getFood().copy()
+        for y in range(capsulesGrid.height):
+            for x in range(capsulesGrid.width):
+                capsulesGrid.data[x][y] = False
+
+        for cap in self.capsules:
+            capsulesGrid.data[cap[0]][cap[1]] = True
+
+        self.start = (startingGameState.getPacmanPosition(), foodGrid, capsulesGrid)
+
         self.startingGameState = startingGameState
         self._expanded = 0
         self.heuristicInfo = {} # A dictionary for the heuristic to store information
@@ -589,7 +605,7 @@ class CornersAndCapsulesProblem(search.SearchProblem):
         """
 
     def isGoalState(self, state):
-        return state[1].count() == 0
+        return (state[2].count() == 0 and state[1].count() == 0)
         """
         Returns whether this search state is a goal state of the problem.
         """
@@ -611,7 +627,7 @@ class CornersAndCapsulesProblem(search.SearchProblem):
         #capsules: Lista de listas de la forma [[1, 2], [3, 4], [3, 1]]. 
         #capsules[i]: Posiciones [x, y] de las capsulas.
         #Las capsulas NO son consideradas como comida.
-        capsules = self.capsules 
+        newWalls = [x[:] for x in self.walls]
 
         for direction in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             #state[0]: posicion del pacman.
@@ -620,32 +636,29 @@ class CornersAndCapsulesProblem(search.SearchProblem):
             dx, dy = Actions.directionToVector(direction)
             nextx, nexty = int(x + dx), int(y + dy)
 
-            if not self.walls[nextx][nexty]:
-                nextFood = state[1].copy()
-                nextFood[nextx][nexty] = False
-                successors.append( ( ((nextx, nexty), nextFood), direction, 1) )
+            nextFood = state[1].copy()
+            nextCapsule = state[2].copy()
+
+            if(state[2].count() != 0):
+                if(nextFood[nextx][nexty] == True):
+                    newWalls[nextx][nexty] = True
+
+                if not newWalls[nextx][nexty]:
+                    nextCapsule[nextx][nexty] = False
+                    successors.append( ( ((nextx, nexty), nextFood, nextCapsule), direction, 1) )
+            else:
+                if not self.walls[nextx][nexty]:
+                    nextFood[nextx][nexty] = False
+                    successors.append( ( ((nextx, nexty), nextFood, nextCapsule), direction, 1) )
+
         return successors
-
-        '''successors = []
-        for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
-            # Add a successor state to the successor list if the action is legal
-            # Here's a code snippet for figuring out whether a new position hits a wall:
-            #   x,y = currentPosition
-            #   dx, dy = Actions.directionToVector(action)
-            #   nextx, nexty = int(x + dx), int(y + dy)
-            #   hitsWall = self.walls[nextx][nexty]
-            #Add your code here
-            util.raiseNotDefined()
-
-        self._expanded += 1 # DO NOT CHANGE
-        return successors'''
 
     def getCostOfActions(self, actions):
         """
         Returns the cost of a particular sequence of actions.  If those actions
         include an illegal move, return 999999.  This is implemented for you.
         """
-        x,y= self.getStartState()[0]
+        x,y = self.getStartState()[0]
         cost = 0
         for action in actions:
             # figure out the next state and see whether it's legal
