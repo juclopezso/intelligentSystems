@@ -566,10 +566,10 @@ def mazeDistance(point1, point2, gameState):
 
 
 class CornersAndCapsulesProblem(search.SearchProblem):
+
     def __init__(self, startingGameState):
         self.walls = startingGameState.getWalls()
         self.capsules = startingGameState.getCapsules()
-
         #Considera las capsulas como comida
         foodGrid = startingGameState.getFood().copy()
 
@@ -683,7 +683,22 @@ def cornersAndCapsulesHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
-    pass
+
+    position, foodGrid, capsulesGrid = state
+
+    allGrid = foodGrid.copy()
+
+    for y in range(capsulesGrid.height):
+        for x in range(capsulesGrid.width):
+            if(capsulesGrid.data[x][y] == True):
+                allGrid.data[x][y] = True
+
+    distances = [0]
+    for food_caps in allGrid.asList():
+        distances.append(mazeDistance(position, food_caps, problem.startingGameState))
+    distanceFurthest = max(distances)
+
+    return distanceFurthest
 
 
 """
@@ -692,5 +707,5 @@ python pacman.py -l tinyMaze -p AStarCornersAndCapsulesAgent
 """
 class AStarCornersAndCapsulesAgent(SearchAgent):
     def __init__(self):
-        self.searchFunction = lambda prob: search.astar(prob, nullHeuristic)
+        self.searchFunction = lambda prob: search.astar(prob, cornersAndCapsulesHeuristic)
         self.searchType = CornersAndCapsulesProblem
