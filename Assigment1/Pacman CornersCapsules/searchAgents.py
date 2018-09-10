@@ -571,20 +571,13 @@ class CornersAndCapsulesProblem(search.SearchProblem):
         self.walls = startingGameState.getWalls()
         self.capsules = startingGameState.getCapsules()
         #Considera las capsulas como comida
-        foodGrid = startingGameState.getFood().copy()
+        foodGrid = startingGameState.getFood()
 
-        #h, w = foodGrid.width, foodGrid.height;
-        #capsulesGrid = [[False for x in range(w)] for y in range(h)] 
+        food = [(x, y) for x in range(len(foodGrid.data))
+                       for y in range(len(foodGrid.data[x]))
+                       if foodGrid.data[x][y] == True]
 
-        capsulesGrid = startingGameState.getFood().copy()
-        for y in range(capsulesGrid.height):
-            for x in range(capsulesGrid.width):
-                capsulesGrid.data[x][y] = False
-
-        for cap in self.capsules:
-            capsulesGrid.data[cap[0]][cap[1]] = True
-
-        self.start = (startingGameState.getPacmanPosition(), foodGrid, capsulesGrid)
+        self.start = (startingGameState.getPacmanPosition(), tuple(food), tuple(self.capsules))
 
         self.startingGameState = startingGameState
         self._expanded = 0
@@ -605,11 +598,11 @@ class CornersAndCapsulesProblem(search.SearchProblem):
         """
 
     def isGoalState(self, state):
-        return (state[2].count() == 0 and state[1].count() == 0)
+        return (not state[2] and not state[1])
         """
         Returns whether this search state is a goal state of the problem.
         """
-        
+
 
     def getSuccessors(self, state):
         """
@@ -624,7 +617,7 @@ class CornersAndCapsulesProblem(search.SearchProblem):
         "Returns successor states, the actions they require, and a cost of 1."
         successors = []
         self._expanded += 1 # DO NOT CHANGE
-        #capsules: Lista de listas de la forma [[1, 2], [3, 4], [3, 1]]. 
+        #capsules: Lista de listas de la forma [[1, 2], [3, 4], [3, 1]].
         #capsules[i]: Posiciones [x, y] de las capsulas.
         #Las capsulas NO son consideradas como comida.
         newWalls = [x[:] for x in self.walls]
@@ -636,20 +629,22 @@ class CornersAndCapsulesProblem(search.SearchProblem):
             dx, dy = Actions.directionToVector(direction)
             nextx, nexty = int(x + dx), int(y + dy)
 
-            nextFood = state[1].copy()
-            nextCapsule = state[2].copy()
+            nextFood = list(state[1])
+            nextCapsule = list(state[2])
 
-            if(state[2].count() != 0):
-                if(nextFood[nextx][nexty] == True):
+            if state[2]:
+                if (nextx, nexty) in nextFood:
                     newWalls[nextx][nexty] = True
 
                 if not newWalls[nextx][nexty]:
-                    nextCapsule[nextx][nexty] = False
-                    successors.append( ( ((nextx, nexty), nextFood, nextCapsule), direction, 1) )
+                    if (nextx, nexty) in nextCapsule:
+                        nextCapsule.remove((nextx, nexty))
+                    successors.append( ( ((nextx, nexty), tuple(nextFood), tuple(nextCapsule)), direction, 1) )
             else:
                 if not self.walls[nextx][nexty]:
-                    nextFood[nextx][nexty] = False
-                    successors.append( ( ((nextx, nexty), nextFood, nextCapsule), direction, 1) )
+                    if (nextx, nexty) in nextFood:
+                        nextFood.remove((nextx, nexty))
+                    successors.append( ( ((nextx, nexty), tuple(nextFood), tuple(nextCapsule)), direction, 1) )
 
         return successors
 
@@ -683,22 +678,24 @@ def cornersAndCapsulesHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
+    def findMindDistance(position, list):
+        minDistance = 0
+        while list:
+            distances = []
+            for element in list:
+                distances.append(abs(position[0] - element[0]) + abs(position[1] - element[1]))
+            minDistance += min(distances)
+            position = list.pop(distances.index(min(distances)))
+        return minDistance
+
 
     position, foodGrid, capsulesGrid = state
 
-    allGrid = foodGrid.copy()
+    if capsulesGrid:
+        return findMindDistance(position, list(capsulesGrid)) + findMindDistance(position, list(foodGrid))
+    else:
+        return findMindDistance(position, list(foodGrid))
 
-    for y in range(capsulesGrid.height):
-        for x in range(capsulesGrid.width):
-            if(capsulesGrid.data[x][y] == True):
-                allGrid.data[x][y] = True
-
-    distances = [0]
-    for food_caps in allGrid.asList():
-        distances.append(mazeDistance(position, food_caps, problem.startingGameState))
-    distanceFurthest = max(distances)
-
-    return distanceFurthest
 
 
 """
