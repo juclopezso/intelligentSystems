@@ -678,23 +678,35 @@ def cornersAndCapsulesHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
-    def findMindDistance(position, list):
+
+
+    def findMindDistance(position, lists):
         minDistance = 0
-        while list:
+        while lists:
             distances = []
-            for element in list:
+            for element in lists:
                 distances.append(abs(position[0] - element[0]) + abs(position[1] - element[1]))
             minDistance += min(distances)
-            position = list.pop(distances.index(min(distances)))
+            position = lists.pop(distances.index(min(distances)))
         return minDistance
 
+    def furthestDistance(position, target):
+        distances = [0]
+        for element in target:
+            distances.append(mazeDistance(position, element, problem.startingGameState))
+        distanceFurthest = max(distances)
+        return distanceFurthest
 
     position, foodGrid, capsulesGrid = state
 
     if capsulesGrid:
-        return findMindDistance(position, list(capsulesGrid)) + findMindDistance(position, list(foodGrid))
+        #return findMindDistance(position, list(capsulesGrid)) + findMindDistance(position, list(foodGrid))
+        return furthestDistance(position, list(capsulesGrid))
     else:
-        return findMindDistance(position, list(foodGrid))
+        #return findMindDistance(position, list(foodGrid))
+        return furthestDistance(position, list(foodGrid))
+
+
 
 
 
