@@ -570,7 +570,7 @@ class CornersAndCapsulesProblem(search.SearchProblem):
     def __init__(self, startingGameState):
         self.walls = startingGameState.getWalls()
         self.capsules = startingGameState.getCapsules()
-        #Considera las capsulas como comida
+
         foodGrid = startingGameState.getFood()
 
         food = [(x, y) for x in range(len(foodGrid.data))
@@ -690,12 +690,28 @@ def cornersAndCapsulesHeuristic(state, problem):
             position = lists.pop(distances.index(min(distances)))
         return minDistance
 
+
     def furthestDistance(position, target):
         distances = [0]
         for element in target:
             distances.append(mazeDistance(position, element, problem.startingGameState))
         distanceFurthest = max(distances)
         return distanceFurthest
+
+
+    def manhatanDistance(position, target):
+        distances = [0]
+        for element in target:
+            distances.append(abs(position[0] - element[0]) + abs(position[1] - element[1]))
+        return max(distances)
+
+
+    def euclideanDistance(position, target):
+        distances = [0]
+        for element in target:
+            distances.append(( (position[0] - element[0]) ** 2 + (position[1] - element[1]) ** 2 ) ** 0.5)
+        return max(distances)
+
 
     position, foodGrid, capsulesGrid = state
 
@@ -705,9 +721,6 @@ def cornersAndCapsulesHeuristic(state, problem):
     else:
         #return findMindDistance(position, list(foodGrid))
         return furthestDistance(position, list(foodGrid))
-
-
-
 
 
 """
