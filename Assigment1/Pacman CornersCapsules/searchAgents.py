@@ -690,6 +690,36 @@ def cornersAndCapsulesHeuristic(state, problem):
             position = lists.pop(distances.index(min(distances)))
         return minDistance
 
+    def heuristicXY(position, target):
+        distances = []
+        for element in target:
+            distances.append(mazeDistance(position, element, problem.startingGameState))
+
+        furthest = None
+        x = 0
+        y = 0
+
+        if distances:
+            distanceFurthest = max(distances)
+            index = distances.index(distanceFurthest)
+            furthest = target[index]
+
+            distances.pop(index)
+            if distances:
+                distanceFurthest = max(distances)
+                index = distances.index(distanceFurthest)
+
+                x = mazeDistance(furthest, target[index], problem.startingGameState)
+            else:
+                x = 0
+        else:
+            x = 0
+
+        if furthest:
+            y = mazeDistance(furthest, position, problem.startingGameState)
+
+
+        return x + y
 
     def furthestDistance(position, target):
         distances = [0]
@@ -717,10 +747,12 @@ def cornersAndCapsulesHeuristic(state, problem):
 
     if capsulesGrid:
         #return findMindDistance(position, list(capsulesGrid)) + findMindDistance(position, list(foodGrid))
-        return furthestDistance(position, list(capsulesGrid))
+        #return furthestDistance(position, list(capsulesGrid))
+        return heuristicXY(position, list(capsulesGrid))
     else:
         #return findMindDistance(position, list(foodGrid))
-        return furthestDistance(position, list(foodGrid))
+        # return furthestDistance(position, list(foodGrid))
+        return heuristicXY(position, list(foodGrid))
 
 
 """
