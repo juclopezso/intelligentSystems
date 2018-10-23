@@ -1,0 +1,28 @@
+class: "DoubleInferenceAgentTest"
+
+seed: "188"
+
+layout: """
+%%%%%%%%%%%
+%   %%%%  %
+%    %    %
+%         %
+%%  %P%   %
+%G%%%%%%%%%
+%%%%%%%%%%%
+% %%%%%%%%%
+%%%%%%%%%%%
+"""
+
+observe: "True"
+
+elapse: "False"
+
+checkUniform: "False"
+maxMoves: "32"
+
+numGhosts: "1"
+ghost: "StaticGhostAgent"
+inference: "ParticleFilter"
+L2Tolerance: "0.001"
+errorMsg: "Particle filter observe test: %d inference errors."
