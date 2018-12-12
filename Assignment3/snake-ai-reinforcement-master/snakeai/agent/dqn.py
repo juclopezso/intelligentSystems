@@ -25,11 +25,11 @@ class DeepQNetworkAgent(AgentBase):
         self.memory = ExperienceReplay((num_last_frames,) + model.input_shape[-2:], model.output_shape[-1], memory_size)
         self.frames = None
 
-        print(self.frames)
+        #print(self.frames)
 
     def begin_episode(self):
         """ Reset the agent for a new episode. """
-        print('BEEGIIIIINNNN:', self.frames)
+        #print('BEEGIIIIINNNN:', self.frames)
         self.frames = None
 
     def get_last_frames(self, observation):
@@ -96,7 +96,8 @@ class DeepQNetworkAgent(AgentBase):
                     # Exploit: take the best known action for this state.
                     q = self.model.predict(state)
                     action = np.argmax(q[0])
-                    print(q, action)
+                    print("Stateeeee")
+                    print(state)
 
                 # Act on the environment.
                 env.choose_action(action)
@@ -150,5 +151,6 @@ class DeepQNetworkAgent(AgentBase):
         
         state = self.get_last_frames(observation)
         q = self.model.predict(state)[0]
-        print('AAAAACCCCCTTTT:', state, q)
+        #print('AAAAACCCCCTTTT:', state, q)
         return np.argmax(q)
+

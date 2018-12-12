@@ -10,6 +10,7 @@ from snakeai.gameplay.environment import Environment
 from snakeai.gui import PyGameGUI
 from snakeai.utils.cli import HelpOnFailArgumentParser
 
+from snakeai.agent.ql import QAgent
 
 def parse_command_line_args(args):
     """ Parse command-line arguments and organize them into a single structured object. """
@@ -28,13 +29,14 @@ def parse_command_line_args(args):
     )
     parser.add_argument(
         '--agent',
-        required=True,
+        required=False,
         type=str,
         choices=['human', 'dqn', 'random'],
         help='Player agent to use.',
     )
     parser.add_argument(
         '--model',
+        required=False,
         type=str,
         help='File containing a pre-trained agent model.',
     )
@@ -86,6 +88,8 @@ def create_agent(name, model):
 
     if name == 'human':
         return HumanAgent()
+    elif name == 'ql':
+        return QAgent()
     elif name == 'dqn':
         if model is None:
             raise ValueError('A model file is required for a DQN agent.')
@@ -153,8 +157,9 @@ def main():
     parsed_args = parse_command_line_args(sys.argv[1:])
 
     env = create_snake_environment(parsed_args.level)
-    model = load_model(parsed_args.model) if parsed_args.model is not None else None
-    agent = create_agent(parsed_args.agent, model)
+    #model = load_model(parsed_args.model) if parsed_args.model is not None else None
+    #agent = create_agent(parsed_args.agent, model)
+    agent = QAgent(env)
 
     run_player = play_cli if parsed_args.interface == 'cli' else play_gui
     run_player(env, agent, num_episodes=parsed_args.num_episodes)

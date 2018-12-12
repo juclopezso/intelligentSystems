@@ -12,10 +12,10 @@ train:
 	./train.py --level "snakeai/levels/10x10-blank.json" --num-episodes 1000
 
 play:
-	./play.py --interface cli --agent dqn --model "dqn-00000900.model" --level "snakeai/levels/10x10-blank.json" --num-episodes 100
+	./play.py --interface cli --level "snakeai/levels/10x10-blank.json" --num-episodes 100
 
 play-gui:
-	./play.py --interface gui --agent dqn --model "dqn-00000900.model" --level "snakeai/levels/10x10-blank.json" --num-episodes 10
+	./play.py --interface gui --level "snakeai/levels/10x10-blank.json" --num-episodes 10
 
 play-human:
 	./play.py --interface gui --agent human --level "snakeai/levels/6x5-blank.json" --num-episodes 1

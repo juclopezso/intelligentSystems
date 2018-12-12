@@ -10,6 +10,7 @@ from keras.layers import *
 from keras.optimizers import *
 
 from snakeai.agent import DeepQNetworkAgent
+from snakeai.agent.ql import QAgent
 from snakeai.gameplay.environment import Environment
 from snakeai.utils.cli import HelpOnFailArgumentParser
 
@@ -91,24 +92,33 @@ def create_dqn_model(env, num_last_frames):
     return model
 
 
+
 def main():
     parsed_args = parse_command_line_args(sys.argv[1:])
 
     env = create_snake_environment(parsed_args.level)
-    model = create_dqn_model(env, num_last_frames=4)
+    #model = create_dqn_model(env, num_last_frames=4)
 
-    agent = DeepQNetworkAgent(
-        model=model,
-        memory_size=-1,
-        num_last_frames=model.input_shape[1]
-    )
-    agent.train(
-        env,
-        batch_size=64,
-        num_episodes=parsed_args.num_episodes,
-        checkpoint_freq=parsed_args.num_episodes // 10,
-        discount_factor=0.95
-    )
+
+    agent = QAgent(env)
+
+    agent.train(env)
+
+    #agent = DeepQNetworkAgent(
+    #    model=model,
+    #    memory_size=-1,
+    #    num_last_frames=model.input_shape[1]
+    #)
+
+    #agent.train(
+    #    env,
+    #    batch_size=64,
+    #    num_episodes=parsed_args.num_episodes,
+    #    checkpoint_freq=parsed_args.num_episodes // 10,
+    #    discount_factor=0.95
+    #)
+
+    
 
 
 if __name__ == '__main__':
