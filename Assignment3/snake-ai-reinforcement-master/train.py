@@ -11,6 +11,7 @@ from keras.optimizers import *
 
 from snakeai.agent import DeepQNetworkAgent
 from snakeai.agent.ql import QAgent
+from snakeai.agent.aql import ApproximateQAgent
 from snakeai.gameplay.environment import Environment
 from snakeai.utils.cli import HelpOnFailArgumentParser
 
@@ -100,7 +101,8 @@ def main():
     #model = create_dqn_model(env, num_last_frames=4)
 
 
-    agent = QAgent(env)
+    #agent = QAgent(env)
+    agent = ApproximateQAgent(env)
 
     agent.train(env)
 

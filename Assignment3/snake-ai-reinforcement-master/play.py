@@ -11,6 +11,7 @@ from snakeai.gui import PyGameGUI
 from snakeai.utils.cli import HelpOnFailArgumentParser
 
 from snakeai.agent.ql import QAgent
+from snakeai.agent.aql import ApproximateQAgent
 
 def parse_command_line_args(args):
     """ Parse command-line arguments and organize them into a single structured object. """
@@ -159,7 +160,9 @@ def main():
     env = create_snake_environment(parsed_args.level)
     #model = load_model(parsed_args.model) if parsed_args.model is not None else None
     #agent = create_agent(parsed_args.agent, model)
-    agent = QAgent(env)
+    
+    #agent = QAgent(env)
+    agent = ApproximateQAgent(env)
 
     run_player = play_cli if parsed_args.interface == 'cli' else play_gui
     run_player(env, agent, num_episodes=parsed_args.num_episodes)
