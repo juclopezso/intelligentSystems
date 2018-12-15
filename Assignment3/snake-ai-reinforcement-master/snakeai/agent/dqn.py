@@ -96,8 +96,8 @@ class DeepQNetworkAgent(AgentBase):
                     # Exploit: take the best known action for this state.
                     q = self.model.predict(state)
                     action = np.argmax(q[0])
-                    print("Stateeeee")
-                    print(state)
+                    #print("Stateeeee")
+                    #print(state)
 
                 # Act on the environment.
                 env.choose_action(action)

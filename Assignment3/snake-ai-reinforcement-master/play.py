@@ -10,6 +10,7 @@ from snakeai.gameplay.environment import Environment
 from snakeai.gui import PyGameGUI
 from snakeai.utils.cli import HelpOnFailArgumentParser
 
+from snakeai.agent.newql import newQAgent
 from snakeai.agent.ql import QAgent
 from snakeai.agent.aql import ApproximateQAgent
 
@@ -113,6 +114,7 @@ def play_cli(env, agent, num_episodes=10):
     """
 
     fruit_stats = []
+    snake_length = []
 
     print()
     print('Playing:')
@@ -129,12 +131,14 @@ def play_cli(env, agent, num_episodes=10):
             game_over = timestep.is_episode_end
 
         fruit_stats.append(env.stats.fruits_eaten)
+        snake_length.append(2+env.stats.fruits_eaten)
 
         summary = 'Episode {:3d} / {:3d} | Timesteps {:4d} | Fruits {:2d}'
-        print(summary.format(episode + 1, num_episodes, env.stats.timesteps_survived, env.stats.fruits_eaten))
+        print(summary.format(episode + 1, num_episodes, env.stats.timesteps_survived, env.stats.fruits_eaten, env.stats.fruits_eaten/num_episodes))
 
     print()
     print('Fruits eaten {:.1f} +/- stddev {:.1f}'.format(np.mean(fruit_stats), np.std(fruit_stats)))
+    print('Mean Snake Length {:.1f}'.format(np.mean(snake_length)))
 
 
 def play_gui(env, agent, num_episodes):
